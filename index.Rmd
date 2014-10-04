@@ -164,7 +164,7 @@ $(document).ready(function() {
     $('#women_twitter').dataTable({
         "sPaginationType": "full_numbers",
         "sScrollX": "100%",
-        "iDisplayLength": 10
+        "iDisplayLength": 50
     });
 });
 </script>
