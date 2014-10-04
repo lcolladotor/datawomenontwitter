@@ -1,45 +1,205 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+  html_document:
+    toc: true
+    theme: united
+---
+
 Women doing data stuff on Twitter
-==================
+=================================
+
+```{r bibsetup, echo=FALSE, message=FALSE, warning=FALSE}
+## Load knitcitations with a clean bibliography
+library('knitcitations')
+cleanbib()
+cite_options(hyperlink = 'to.doc', citation_format = 'text', style = 'html')
+
+bibs <- c('knitcitations' = citation('knitcitations'),
+    'knitr' = citation('knitr')[1]
+)
+write.bibtex(bibs, file = 'NewPostRefs.bib')
+bib <- read.bibtex('NewPostRefs.bib')
+names(bib) <- names(bibs)
+```
 
 A list of women doing great data things on Twitter 
-(started here: http://simplystatistics.org/2014/09/09/a-non-comprehensive-list-of-awesome-female-data-people-on-twitter/)
+(started at [_A non-comprehensive list of awesome female data people on Twitter_](http://simplystatistics.org/2014/09/09/a-non-comprehensive-list-of-awesome-female-data-people-on-twitter/))
 
 
-I was just talking to a student who mentioned she didn't know Jenny Bryan was on Twitter. She is and she is an awesome person to follow. I also realized that I hadn't seen a good list of women on Twitter who do stats/data. So I thought I'd make one. This list is what I could make in 15 minutes based on my own feed and will, with 100% certainty, miss really people. Can you please add them in the comments and I'll update the list?
+I was just talking to a student who mentioned she didn't know Jenny Bryan was on Twitter. She is and she is an awesome person to follow. I also realized that I hadn't seen a good list of women on Twitter who do stats/data. So I thought I'd make one. This list is what I could make in 15 minutes based on my own feed and will, with 100% certainty, miss really good people. Can you please add them in the comments and I'll update the list?
 
-@JennyBryan (Jenny Bryan) statistics professor at UBC, teaching a great intro to data science class right now.
-@hspter (Hilary Parker) data analyst at Etsy (former Hopkins grad student!) and co-creator (I think) of #rcatladies, also wrote this nice post on writing an R package from scratch
-@acfrazee (Alyssa Frazee) Ph.D. student at Hopkins, writes a great blog on data stuff, works on statistical genomics
-@emsweene57 (Elizabeth Sweeney) - Hopkins Ph.D. student, developer of methods for neuroimaging.
-@hmason (Hilary Mason) - currently running one of my favorite startups Fast Forward Labs, but basically needs no introduction, one of the biggest names in data science right now.
-@sherrirose (Sherri Rose) - former Hopkins postdoc, now at Harvard. Literally wrote the book on targeted learning.
-@eloyan_ani (Ani Eloyan) - Hopkins Biostat faculty, working on neuroimaging and EMRs. Lead the team that won the ADHD-200 competition.
-@mrogati (Monica Rogati) - Former Linkedin data scientist, now running the data team at Jawbone.
-@annmariastat (AnnMaria De Mars) - runs the Julia group, also world class judoka, writes one of my favorite stats/education blogs. 
-@kara_woo (Kara Woo) - Works at the National Center for Ecological Analysis and Synthesis and maintains their projections blog
-@jhubiostat (Betsy Ogburn) - Hopkins biostat faculty, not technically her account. But she is the reason this is the funniest/best academic department twitter account out there.
-@lovestats  (Annie Pettit) - Does surveys and data quality/MRX work. If you are into MRX, check out her blog.
-@ProfEmilyOster (Emily Oster) - Econ professor at U Chicago. Has been my favorite writer for FiveThirtyEight since their relaunch.
-@monachalabi (Mona Chalabi) - writer for FiveThirtyEight, I like her "Am I normal" series of posts.
-@lisaczhang  (Lisa Zhang)- cofounder of Polychart.
-@notawful (Jessica Hartnett) - professor at Gannon University, writes a great blog on teaching statistics.
-@AliciaOshlack (Alicia Oshlack) - researcher at Murdoch Children's research institute, one of the real superstars in computational genomics.
-@AmeliaMN (Amelia McNamara) - graduate student at UCLA, works on the Mobilize project and other awesome data education initiatives in LA school system.
- @leighadlr (LEIGH ARINO DE LA RUBIA) Editor in chief of DataScience.LA
-@inesgn (Ines Germendia) - data scientist working on official statistics at Basque Statistics - Eustat
-@sgrifter  (Sandy Griffith) - Biostat Ph.D., fellow #rcatladies creator, professor at the Cleveland Clinic in quantitative medicine
-@ladamic (Lada Adamic) - professor at Michigan, teacher of really highly regarded social network analysis class on Coursera, now at Facebook (I think)
-@stephaniehicks - (Stephanie Hicks) postdoc in compbio at Harvard, lead teaching assistant for Data Science course at Harvard.
-@ansate - (Melissa Santos) manager of Hadoop infrastructure at Etsy, maintainer of the women in data list below.
-@lauramclay (Laura McClay) - professor of operations research at UW Madison, writes a blog with an amazing name: Punk Rock Operations Research.
-@bioannie (Laura Hatfield) - professor at Harvard, also has one of the best data titles I've ever heard: Princess of Bayesia
-@kaythaney (Kaitlin Thaney)  - director of the Mozilla Science Lab, also works with Data Kind UK.
-@laurieskelly  (Laurie Skelly)- Data scientist at Data Scope analytics
-@bo_p (Bo Peng) - Data scientist at Data Scope analytics
-@siminaboca (Simina Boca) - former Hopkins Ph.D. student, now assistant professor at Georgetown in Biomedical informatics.
-@HelenPowell01 (Helen Powell) - postdoc in Biostatistics at Hopkins, works on statistics for relationship between air pollution and health.
-@victoriastodden (Victoria Stodden) - one of the leaders in the legal and sociological aspects of reproducible research.
+```{r 'input', bootstrap.show.code = FALSE}
+## Input data
+womenTwitter <- data.frame(
+    Handle = c(
+        '@JennyBryan',
+        '@hspter',
+        '@acfrazee',
+        '@emsweene57',
+        '@hmason',
+        '@sherrirose',
+        '@eloyan_ani',
+        '@mrogati',
+        '@annmariastat',
+        '@kara_woo',
+        '@jhubiostat',
+        '@lovestats',
+        '@ProfEmilyOster',
+        '@monachalabi',
+        '@lisaczhang',
+        '@notawful',
+        '@AliciaOshlack',
+        '@AmeliaMN',
+        '@leighadlr',
+        '@inesgn',
+        '@sgrifter',
+        '@ladamic',
+        '@stephaniehicks',
+        '@ansate',
+        '@lauramclay',
+        '@bioannie',
+        '@kaythaney',
+        '@laurieskelly',
+        '@bo_p',
+        '@siminaboca',
+        '@HelenPowell01',
+        '@victoriastodden'
+    ),
+    Name = c(
+        'Jenny Bryan',
+        'Hilary Parker',
+        'Alyssa Frazee',
+        'Elizabeth Sweeney',
+        'Hilary Mason',
+        'Sherri Rose',
+        'Ani Eloyan',
+        'Monica Rogati',
+        'AnnMaria De Mars',
+        'Kara Woo',
+        'Betsy Ogburn',
+        'Annie Pettit',
+        'Emily Oster',
+        'Mona Chalabi',
+        'Lisa Zhang',
+        'Jessica Hartnett',
+        'Alicia Oshlack',
+        'Amelia McNamara',
+        'LEIGH ARINO DE LA RUBIA',
+        'Ines Germendia',
+        'Sandy Griffith',
+        'Lada Adamic',
+        'Stephanie Hicks',
+        'Melissa Santos',
+        'Laura McClay',
+        'Laura Hatfield',
+        'Kaitlin Thaney',
+        'Laurie Skelly',
+        'Bo Peng',
+        'Simina Boca',
+        'Helen Powell',
+        'Victoria Stodden'
+    ),
+    Description = c(
+        'statistics professor at UBC, teaching a great intro to data science class right now',
+        'data analyst at Etsy (former Hopkins grad student!) and co-creator (I think) of #rcatladies, also wrote this nice post on writing an R package from scratch',
+        'Ph.D. student at Hopkins, writes a great blog on data stuff, works on statistical genomics',
+        'Hopkins Ph.D. student, developer of methods for neuroimaging',
+        'currently running one of my favorite startups Fast Forward Labs, but basically needs no introduction, one of the biggest names in data science right now',
+        'former Hopkins postdoc, now at Harvard. Literally wrote the book on targeted learning',
+        'Hopkins Biostat faculty, working on neuroimaging and EMRs. Lead the team that won the ADHD-200 competition',
+        'Former Linkedin data scientist, now running the data team at Jawbone',
+        'runs the Julia group, also world class judoka, writes one of my favorite stats/education blogs',
+        'Works at the National Center for Ecological Analysis and Synthesis and maintains their projections blog',
+        'Hopkins biostat faculty, not technically her account. But she is the reason this is the funniest/best academic department twitter account out there',
+        'Does surveys and data quality/MRX work. If you are into MRX, check out her blog',
+        'Econ professor at U Chicago. Has been my favorite writer for FiveThirtyEight since their relaunch',
+        'writer for FiveThirtyEight, I like her "Am I normal" series of posts',
+        'cofounder of Polychart',
+        'professor at Gannon University, writes a great blog on teaching statistics',
+        "researcher at Murdoch Children's research institute, one of the real superstars in computational genomics",
+        'graduate student at UCLA, works on the Mobilize project and other awesome data education initiatives in LA school system',
+        'Editor in chief of DataScience.LA',
+        'data scientist working on official statistics at Basque Statistics - Eustat',
+        'Biostat Ph.D., fellow #rcatladies creator, professor at the Cleveland Clinic in quantitative medicine',
+        'professor at Michigan, teacher of really highly regarded social network analysis class on Coursera, now at Facebook (I think)',
+        'postdoc in compbio at Harvard, lead teaching assistant for Data Science course at Harvard',
+        'manager of Hadoop infrastructure at Etsy, maintainer of the women in data list below',
+        'professor of operations research at UW Madison, writes a blog with an amazing name: Punk Rock Operations Research',
+        "professor at Harvard, also has one of the best data titles I've ever heard: Princess of Bayesia",
+        'director of the Mozilla Science Lab, also works with Data Kind UK',
+        'Data scientist at Data Scope analytics',
+        'Data scientist at Data Scope analytics',
+        'former Hopkins Ph.D. student, now assistant professor at Georgetown in Biomedical informatics',
+        'postdoc in Biostatistics at Hopkins, works on statistics for relationship between air pollution and health',
+        'one of the leaders in the legal and sociological aspects of reproducible research'
+    )
+)
+## Add links to follow
+womenTwitter$Follow <- paste0("<a href=\"https://twitter.com/",
+    gsub('@', '', womenTwitter$Handle),
+    "\" class=\"twitter-follow-button\" data-show-count=\"false\">",
+    womenTwitter$Handle, "</a>")
+```
+
+
+
+
+<link rel='stylesheet' href='http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css' />
+<script src='http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js'></script>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+```{r, results = 'asis', echo = FALSE}
+library('knitr')
+## Display the data
+kable(womenTwitter, format = 'html', table.attr='id="women_twitter"')
+```
+
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+    $('#women_twitter').dataTable({
+        "sPaginationType": "full_numbers",
+        "sScrollX": "100%",
+        "iDisplayLength": 50
+    });
+});
+</script>
+
+
+Interactive table powered by [DataTables](http://www.datatables.net/) and `knitr` `r citep(bib[['knitr']])`.
+
+
+# More
+
 I have also been informed that these Twitter lists are probably better than my post. But I'll keep updating my list anyway cause I want to know who all the right people to follow are!
 
-https://twitter.com/ansate/lists/women-in-data
-https://twitter.com/BecomingDataSci/lists/women-in-data-science
+* [women-in-data](https://twitter.com/ansate/lists/women-in-data)
+* [women-in-data-science](https://twitter.com/BecomingDataSci/lists/women-in-data-science)
+
+# References
+
+Citations made with `knitcitations` `r citep(bib[['knitcitations']])`.
+
+
+```{r bibliography, results='asis', echo=FALSE, cache=FALSE}
+## Print bibliography
+bibliography()
+```
+
+
+```{r 'cleanupBib', echo = FALSE, results = 'hide'}
+## Clean up
+file.remove('NewPostRefs.bib')
+```
+
+Date this page was last rendered:
+
+```{r date, echo = FALSE}
+## date
+Sys.time()
+```
+

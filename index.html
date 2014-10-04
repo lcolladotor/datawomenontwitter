@@ -1,0 +1,1687 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  
+  <!-- bootstrap -->
+  <!--<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet"  id="style">-->
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  
+  <!-- highlight.js -->
+  <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/default.min.css" rel="stylesheet" id="code-style">-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/highlight.min.js"></script>
+  <script>
+  hljs.LANGUAGES.r=function(a){var b="([a-zA-Z]|\\.[a-zA-Z.])[a-zA-Z0-9._]*";return{c:[a.HCM,{b:b,l:b,k:{keyword:"function if in break next repeat else for return switch while try tryCatch|10 stop warning require library attach detach source setMethod setGeneric setGroupGeneric setClass ...|10",literal:"NULL NA TRUE FALSE T F Inf NaN NA_integer_|10 NA_real_|10 NA_character_|10 NA_complex_|10"},r:0},{cN:"number",b:"0[xX][0-9a-fA-F]+[Li]?\\b",r:0},{cN:"number",b:"\\d+(?:[eE][+\\-]?\\d*)?L\\b",r:0},{cN:"number",b:"\\d+\\.(?!\\d)(?:i\\b)?",r:0},{cN:"number",b:"\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",r:0},{b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[a.BE],r:0},{cN:"string",b:"'",e:"'",c:[a.BE],r:0}]}}(hljs); </script>
+  <!--<script type="text/javascript", src="https://yandex.st/highlightjs/7.3/languages/r.min.js"></script>-->
+  
+  <!-- Manific Popup -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/0.8.9/jquery.magnific-popup.min.js"></script>
+  
+  <script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+  <script defer="defer">
+  // Function to generate the dynamic table of contents
+  jQuery.fn.generate_TOC = function () {
+    var base = $(this[0]);
+  
+    var selectors = ['h1', 'h2', 'h3', 'h4'];
+  
+    var last_ptr = [{}, {}, {}, {}];
+  
+    var anchors = {};
+  
+    generate_anchor = function (text) {
+      var test = text.replace(/\W/g, '_');
+  
+      while(test in anchors){
+        //if no suffix, add one
+        if(test.match(/_\d+$/) === null){
+          test = test + "_2";
+        }
+        //else generate unique id for duplicates by adding one to the suffix
+        else {
+          test = test.replace(/_(\d+)$/, function(match, number){ var num=+number+1; return("_" + num) });
+        }
+      }
+      anchors[test]=1;
+      return(test);
+    }
+  
+    $(selectors.join(',')).filter(function(index) { return $(this).parent().attr("id") != 'header'; }).each(function () {
+  
+      var heading = $(this);
+      var idx = selectors.indexOf(heading.prop('tagName').toLowerCase());
+      var itr = 0;
+  
+      while (itr <= idx) {
+        if (jQuery.isEmptyObject(last_ptr[itr])) {
+          last_ptr[itr] = $('<ul>').addClass('nav');
+          if (itr === 0) {
+            base.append(last_ptr[itr])
+          } else {
+            if(last_ptr[itr-1].children('li').length === 0){
+              last_ptr[itr-1].append(last_ptr[itr]);
+            }
+            else {
+              last_ptr[itr - 1].children('li').last().append(last_ptr[itr]);
+            }
+          }
+        }
+        itr++;
+      }
+      var anchor = generate_anchor(heading.text());
+      heading.attr('id', anchor);
+      var a = $('<a>')
+      .text(heading.text())
+      .attr('href', '#' + anchor);
+  
+    var li = $('<li>')
+      .append(a);
+  
+    last_ptr[idx].append(li);
+    for (i = idx + 1; i < last_ptr.length; i++) {
+      last_ptr[i] = {};
+    }
+    });
+  }
+  /* run scripts when document is ready */
+  $(function() {
+    "use strict";
+  
+    var $window = $(window);
+    var $body = $(document.body);
+  
+    /* size of thumbnails */
+  
+    var hidden_types = ['source']
+    var output_types = ['output', 'message', 'warning', 'error']
+  
+    /* style tables */
+    $('table').addClass('table table-striped table-bordered table-hover table-condensed');
+  
+    $('pre code').each(function(i, e) {
+      hljs.highlightBlock(e);
+    });
+  
+    /* Magnific Popup */
+    $(".thumbnail").each(function(){
+      $(this).magnificPopup({
+        disableOn: 768,
+        closeOnContentClick: true,
+  
+        type: 'image',
+        items: {
+          src: $(this).find('img').attr('src'),
+        }
+      });
+    });
+  
+    function toggle_block(obj, show) {
+      var span = obj.find('span');
+      if(show === true){
+        span.removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        obj.next('pre').slideDown();
+      }
+      else {
+        span.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+        obj.next('pre').slideUp();
+      }
+    }
+  
+    function toggle_thumbnails(imgs, show){
+      if(show === true){
+        imgs.parents().show()
+        imgs.slideDown();
+      }
+      else {
+        imgs.slideUp(400, function(){ $(this).parent().hide(); });
+      }
+    }
+  
+    function global_toggle(obj){
+      var type = obj.attr('type');
+      var show = !obj.parent('li').hasClass('active');
+      if(show === true){
+        obj.parent('li').addClass('active');
+      }
+      else{
+        obj.parent('li').removeClass('active');
+      }
+      if(type == 'figure'){
+        toggle_thumbnails($('.thumbnail img'), show);
+      }
+      else {
+        $('.toggle.' + type).each(function() { toggle_block($(this), show); });
+      }
+    }
+  
+    /* onclick toggle next code block */
+    $('.toggle').click(function() {
+      var span = $(this).find('span');
+      toggle_block($(this), !span.hasClass('glyphicon-chevron-down'));
+      return false
+    })
+  
+    // global toggles
+    $('.toggle-global').click(function(){
+      var type = $(this).attr('type');
+      if(type === 'all-source'){
+          $('li a.source').each(function() {
+            global_toggle($(this));
+          });
+        }
+      else if(type === 'all-output'){
+        $.each(output_types, function(i, val){
+          console.log(val);
+          global_toggle($('li a.' + val));
+        });
+      }
+      else {
+        console.log($(this));
+        global_toggle($(this));
+      }
+      return false;
+    });
+    /* table of contents */
+    if($(['h1', 'h2', 'h3', 'h4'].join(',')).length > 0){
+      $('body > #wrap > .container > .row').append('<div class="col-md-2"><div id="toc" class="well sidebar sidenav affix hidden-print"/></div>');
+      $('#toc').generate_TOC();
+    }
+  
+    $.each(hidden_types, function(i, type) {
+      $('li[type=' + type + ']').each(function(){ global_toggle($(this)); });
+    });
+  
+    /* remove paragraphs with no content */
+    $('p:empty').remove();
+  
+    $body.scrollspy({
+      target: '.sidebar',
+    });
+  
+    /* theme switch */
+    $('.theme-switch').click(function(){
+      var css = $('link[title=' + $(this).attr('title') + ']');
+      $('#theme[rel=stylesheet]').attr('href', css.attr('href'));
+      $('.theme-switch').closest('li').removeClass('active');
+      $(this).closest('li').addClass('active');
+      return false;
+    });
+    /* code style switch */ //TODO use same function for both of these?
+    $('.highlight-switch').click(function(){
+      var css = $('link[title="' + $(this).attr('title') + '"]');
+      $('#highlight[rel=stylesheet]').attr('href', css.attr('href'));
+      $('.highlight-switch').closest('li').removeClass('active');
+      $(this).closest('li').addClass('active');
+      return false;
+    });
+  
+    //TODO refresh on show/hide
+    $window.on('load', function () {
+      $body.scrollspy('refresh');
+    })
+  
+  });
+  
+  </script>
+  <style>
+  /* Knitr_bootstrap styles */
+  #header {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  #wrap .container-fluid {
+    padding: 0;
+    overflow: hidden;
+  }
+  .toggle{
+    text-transform: capitalize;
+  }
+  
+  .toggle-global{
+    text-transform: capitalize;
+  }
+  
+  /* Sticky footer styles */
+  * {
+    margin:0;
+  }
+  html,
+  body {
+      height: 100%;
+      padding:0 !important;
+      /* The html and body elements cannot have any padding or margin. */
+      /*overflow-x: hidden;*/
+  }
+  
+  /* Wrapper for page content to push down footer */
+  #wrap {
+      min-height: 100%;
+      height: auto !important;
+      height: 100%;
+      /* Negative indent footer by it's height */
+      margin: 0 auto -120px;
+  }
+  
+  /* Set the fixed height of the footer here */
+  #push,
+  #footer {
+      height: 120px;
+  }
+  
+  #footer {
+    text-align: center;
+  }
+  
+  /* Top level subheader elements.  These are the first nested items underneath a header element. */
+  .header li {
+    font-size: 20px;
+  }
+  
+  /* Makes the font smaller for all subheader elements. */
+  .sub-header li {
+      font-size: 12px;
+  }
+  
+  button.thumbnails {
+    margin-left:0px;
+  }
+  
+  /*
+   * Side navigation
+   *
+   * Scrollspy and affixed enhanced navigation to highlight sections and secondary
+   * sections of docs content.
+   */
+  
+  /* By default it's not affixed in mobile views, so undo that */
+  .sidebar.affix {
+    position: static;
+  }
+  
+  /* First level of nav */
+  .sidenav {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top:    10px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  /* All levels of nav */
+  .sidebar .nav > li > a {
+    display: block;
+    padding: 5px 20px;
+  }
+  .sidebar .nav > li > a:hover,
+  .sidebar .nav > li > a:focus {
+    text-decoration: none;
+    border-right: 1px solid;
+  }
+  .sidebar .nav > .active > a,
+  .sidebar .nav > .active:hover > a,
+  .sidebar .nav > .active:focus > a {
+    font-weight: bold;
+    background-color: transparent;
+    border-right: 1px solid;
+  }
+  
+  /* Nav: second level (shown on .active) */
+  .sidebar .nav .nav {
+    display: none; /* Hide by default, but at >768px, show it */
+    margin-bottom: 8px;
+  }
+  .sidebar .nav .nav > li > a {
+    padding-top:    3px;
+    padding-bottom: 3px;
+    padding-left: 30px;
+    font-size: 90%;
+  }
+  
+  .sidebar .nav .nav .nav > li > a {
+    padding-left: 40px;
+  }
+  .sidebar .nav .nav .nav .nav > li > a {
+    padding-left: 50px;
+  }
+  
+  /* Show and affix the side nav when space allows it */
+  @media screen and (min-width: 992px) {
+    .sidebar .nav > .active > ul {
+      display: block;
+    }
+    /* Widen the fixed sidebar */
+    .sidebar.affix,
+    .sidebar.affix-bottom {
+      width: 213px;
+    }
+    .sidebar.affix-top,
+    .sidebar.affix {
+      position: fixed; /* Undo the static from mobile first approach */
+      top: 30px;
+    }
+    .sidebar.affix-bottom {
+      position: absolute; /* Undo the static from mobile first approach */
+    }
+    .sidebar.affix-bottom .sidenav,
+    .sidebar.affix .sidenav {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  @media screen and (min-width: 1200px) {
+    /* Widen the fixed sidebar again */
+    .sidebar.affix-bottom,
+    .sidebar.affix {
+      width: 263px;
+    }
+  }
+  
+  #toc {
+    padding: 10px 0px;
+    margin:0;
+    border:0;
+  }
+  
+  
+  .panel pre {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  button + pre {
+    margin: 0;
+    padding: 0;
+  }
+  pre code {
+    border-radius: 0;
+  }
+  /* Magnific Popup CSS */
+  .mfp-bg {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1042;
+    overflow: hidden;
+    position: fixed;
+    background: #0b0b0b;
+    opacity: 0.8;
+    filter: alpha(opacity=80); }
+  
+  .mfp-wrap {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1043;
+    position: fixed;
+    outline: none !important;
+    -webkit-backface-visibility: hidden; }
+  
+  .mfp-container {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    padding: 0 8px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+  
+  .mfp-container:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle; }
+  
+  .mfp-align-top .mfp-container:before {
+    display: none; }
+  
+  .mfp-content {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 auto;
+    text-align: left;
+    z-index: 1045; }
+  
+  .mfp-inline-holder .mfp-content,
+  .mfp-ajax-holder .mfp-content {
+    width: 100%;
+    cursor: auto; }
+  
+  .mfp-ajax-cur {
+    cursor: progress; }
+  
+  .mfp-zoom-out-cur,
+  .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
+    cursor: -moz-zoom-out;
+    cursor: -webkit-zoom-out;
+    cursor: zoom-out; }
+  
+  .mfp-zoom {
+    cursor: pointer;
+    cursor: -webkit-zoom-in;
+    cursor: -moz-zoom-in;
+    cursor: zoom-in; }
+  
+  .mfp-auto-cursor .mfp-content {
+    cursor: auto; }
+  
+  .mfp-close,
+  .mfp-arrow,
+  .mfp-preloader,
+  .mfp-counter {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none; }
+  
+  .mfp-loading.mfp-figure {
+    display: none; }
+  
+  .mfp-hide {
+    display: none !important; }
+  
+  .mfp-preloader {
+    color: #cccccc;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    text-align: center;
+    margin-top: -0.8em;
+    left: 8px;
+    right: 8px;
+    z-index: 1044; }
+  
+  .mfp-preloader a {
+    color: #cccccc; }
+  
+  .mfp-preloader a:hover {
+    color: white; }
+  
+  .mfp-s-ready .mfp-preloader {
+    display: none; }
+  
+  .mfp-s-error .mfp-content {
+    display: none; }
+  
+  button.mfp-close,
+  button.mfp-arrow {
+    overflow: visible;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    display: block;
+    padding: 0;
+    z-index: 1046;
+    -webkit-box-shadow: none;
+    box-shadow: none; }
+  
+  button::-moz-focus-inner {
+    padding: 0;
+    border: 0; }
+  
+  .mfp-close {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    text-decoration: none;
+    text-align: center;
+    opacity: 0.65;
+    padding: 0 0 18px 10px;
+    color: white;
+    font-style: normal;
+    font-size: 28px;
+    font-family: Arial, Baskerville, monospace; }
+    .mfp-close:hover, .mfp-close:focus {
+      opacity: 1; }
+    .mfp-close:active {
+      top: 1px; }
+  
+  .mfp-close-btn-in .mfp-close {
+    color: #333333; }
+  
+  .mfp-image-holder .mfp-close,
+  .mfp-iframe-holder .mfp-close {
+    color: white;
+    right: -6px;
+    text-align: right;
+    padding-right: 6px;
+    width: 100%; }
+  
+  .mfp-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #cccccc;
+    font-size: 12px;
+    line-height: 18px; }
+  
+  .mfp-arrow {
+    position: absolute;
+    opacity: 0.65;
+    margin: 0;
+    top: 50%;
+    margin-top: -55px;
+    padding: 0;
+    width: 90px;
+    height: 110px;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+  
+  .mfp-arrow:active {
+    margin-top: -54px; }
+  
+  .mfp-arrow:hover,
+  .mfp-arrow:focus {
+    opacity: 1; }
+  
+  .mfp-arrow:before, .mfp-arrow:after,
+  .mfp-arrow .mfp-b,
+  .mfp-arrow .mfp-a {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-top: 35px;
+    margin-left: 35px;
+    border: medium inset transparent; }
+  .mfp-arrow:after,
+  .mfp-arrow .mfp-a {
+    border-top-width: 13px;
+    border-bottom-width: 13px;
+    top: 8px; }
+  .mfp-arrow:before,
+  .mfp-arrow .mfp-b {
+    border-top-width: 21px;
+    border-bottom-width: 21px; }
+  
+  .mfp-arrow-left {
+    left: 0; }
+    .mfp-arrow-left:after,
+    .mfp-arrow-left .mfp-a {
+      border-right: 17px solid white;
+      margin-left: 31px; }
+    .mfp-arrow-left:before,
+    .mfp-arrow-left .mfp-b {
+      margin-left: 25px;
+      border-right: 27px solid #3f3f3f; }
+  
+  .mfp-arrow-right {
+    right: 0; }
+    .mfp-arrow-right:after,
+    .mfp-arrow-right .mfp-a {
+      border-left: 17px solid white;
+      margin-left: 39px; }
+    .mfp-arrow-right:before,
+    .mfp-arrow-right .mfp-b {
+      border-left: 27px solid #3f3f3f; }
+  
+  .mfp-iframe-holder {
+    padding-top: 40px;
+    padding-bottom: 40px; }
+  
+  .mfp-iframe-holder .mfp-content {
+    line-height: 0;
+    width: 100%;
+    max-width: 900px; }
+  
+  .mfp-iframe-scaler {
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    padding-top: 56.25%; }
+  
+  .mfp-iframe-scaler iframe {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    background: black; }
+  
+  .mfp-iframe-holder .mfp-close {
+    top: -40px; }
+  
+  /* Main image in popup */
+  img.mfp-img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    line-height: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 40px 0 40px;
+    margin: 0 auto; }
+  
+  /* The shadow behind the image */
+  .mfp-figure:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 40px;
+    bottom: 40px;
+    display: block;
+    right: 0;
+    width: auto;
+    height: auto;
+    z-index: -1;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    background: #444444; }
+  
+  .mfp-figure {
+    line-height: 0; }
+  
+  .mfp-bottom-bar {
+    margin-top: -36px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    cursor: auto; }
+  
+  .mfp-title {
+    text-align: left;
+    line-height: 18px;
+    color: #f3f3f3;
+    word-wrap: break-word;
+    padding-right: 36px; }
+  
+  .mfp-figure small {
+    color: #bdbdbd;
+    display: block;
+    font-size: 12px;
+    line-height: 14px; }
+  
+  .mfp-image-holder .mfp-content {
+    max-width: 100%; }
+  
+  .mfp-gallery .mfp-image-holder .mfp-figure {
+    cursor: pointer; }
+  
+  @media screen and (max-width: 800px) and (orientation: landscape), screen and (max-height: 300px) {
+    /**
+     * Remove all paddings around the image on small screen
+     */
+    .mfp-img-mobile .mfp-image-holder {
+      padding-left: 0;
+      padding-right: 0; }
+  
+    .mfp-img-mobile img.mfp-img {
+      padding: 0; }
+  
+    /* The shadow behind the image */
+    .mfp-img-mobile .mfp-figure:after {
+      top: 0;
+      bottom: 0; }
+  
+    .mfp-img-mobile .mfp-bottom-bar {
+      background: rgba(0, 0, 0, 0.6);
+      bottom: 0;
+      margin: 0;
+      top: auto;
+      padding: 3px 5px;
+      position: fixed;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box; }
+  
+    .mfp-img-mobile .mfp-bottom-bar:empty {
+      padding: 0; }
+  
+    .mfp-img-mobile .mfp-counter {
+      right: 5px;
+      top: 3px; }
+  
+    .mfp-img-mobile .mfp-close {
+      top: 0;
+      right: 0;
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      background: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      text-align: center;
+      padding: 0; }
+  
+    .mfp-img-mobile .mfp-figure small {
+      display: inline;
+      margin-left: 5px; } }
+  @media all and (max-width: 900px) {
+    .mfp-arrow {
+      -webkit-transform: scale(0.75);
+      transform: scale(0.75); }
+  
+    .mfp-arrow-left {
+      -webkit-transform-origin: 0;
+      transform-origin: 0; }
+  
+    .mfp-arrow-right {
+      -webkit-transform-origin: 100%;
+      transform-origin: 100%; }
+  
+    .mfp-container {
+      padding-left: 6px;
+      padding-right: 6px; } }
+  .mfp-ie7 .mfp-img {
+    padding: 0; }
+  .mfp-ie7 .mfp-bottom-bar {
+    width: 600px;
+    left: 50%;
+    margin-left: -300px;
+    margin-top: 5px;
+    padding-bottom: 5px; }
+  .mfp-ie7 .mfp-container {
+    padding: 0; }
+  .mfp-ie7 .mfp-content {
+    padding-top: 44px; }
+  .mfp-ie7 .mfp-close {
+    top: 0;
+    right: 0;
+    padding-top: 0; }
+  
+  //Magnific overrides
+  .mfp-image img{
+    background: white;
+  }
+  .mfp-figure:after {
+    background: white;
+  }
+  
+  /*
+   * Off Canvas navbar toggle right
+   * --------------------------------------------------
+   */
+  
+  @media screen and (max-width: 768px) {
+    .row-offcanvas .collapsing {
+    -webkit-transition: none 0;
+      -moz-transition: none 0;
+      transition: none 0;
+    }
+   .row-offcanvas .navbar {
+    position: absolute;
+    z-index: 2;
+      right:0;
+      height:100%;
+      width:55px;
+      border:0;
+      background-color:transparent;
+    }
+    .row-offcanvas .navbar-toggle {
+      margin-right: 5px;
+      margin-left: 5px;
+    }
+    .row-offcanvas {
+      position: relative;
+    }
+    .row-offcanvas-right.active .navbar {
+    position: absolute;
+    z-index: 2;
+      right: -28.4%;
+      width:40%;
+      background-color:#eee;
+      border:0 solid #ddd;
+      border-left-width:1px;
+    }
+    .row-offcanvas-right.active {
+      left: -30%;
+    }
+    .row-offcanvas-right.active .navbar-collapse {
+      position: relative;
+      width: 100%;
+    }
+    .row-offcanvas .content {
+    /*width:calc(100% - 60px);*/
+    }
+  }
+  </style>
+</head>
+<body>
+<div id="wrap">
+<div class="container">
+<div class="row row-offcanvas row-offcanvas-right">
+<div class="contents col-xs-12 col-md-10">
+<h1>Women doing data stuff on Twitter</h1>
+<p>A list of women doing great data things on Twitter (started at <a href="http://simplystatistics.org/2014/09/09/a-non-comprehensive-list-of-awesome-female-data-people-on-twitter/"><em>A non-comprehensive list of awesome female data people on Twitter</em></a>)</p>
+<p>I was just talking to a student who mentioned she didn't know Jenny Bryan was on Twitter. She is and she is an awesome person to follow. I also realized that I hadn't seen a good list of women on Twitter who do stats/data. So I thought I'd make one. This list is what I could make in 15 minutes based on my own feed and will, with 100% certainty, miss really good people. Can you please add them in the comments and I'll update the list?</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-up"></span> R source
+</button>
+<pre style="display:none"><code class="source r">## Input data
+womenTwitter <- data.frame(
+    Handle = c(
+        '@JennyBryan',
+        '@hspter',
+        '@acfrazee',
+        '@emsweene57',
+        '@hmason',
+        '@sherrirose',
+        '@eloyan_ani',
+        '@mrogati',
+        '@annmariastat',
+        '@kara_woo',
+        '@jhubiostat',
+        '@lovestats',
+        '@ProfEmilyOster',
+        '@monachalabi',
+        '@lisaczhang',
+        '@notawful',
+        '@AliciaOshlack',
+        '@AmeliaMN',
+        '@leighadlr',
+        '@inesgn',
+        '@sgrifter',
+        '@ladamic',
+        '@stephaniehicks',
+        '@ansate',
+        '@lauramclay',
+        '@bioannie',
+        '@kaythaney',
+        '@laurieskelly',
+        '@bo_p',
+        '@siminaboca',
+        '@HelenPowell01',
+        '@victoriastodden'
+    ),
+    Name = c(
+        'Jenny Bryan',
+        'Hilary Parker',
+        'Alyssa Frazee',
+        'Elizabeth Sweeney',
+        'Hilary Mason',
+        'Sherri Rose',
+        'Ani Eloyan',
+        'Monica Rogati',
+        'AnnMaria De Mars',
+        'Kara Woo',
+        'Betsy Ogburn',
+        'Annie Pettit',
+        'Emily Oster',
+        'Mona Chalabi',
+        'Lisa Zhang',
+        'Jessica Hartnett',
+        'Alicia Oshlack',
+        'Amelia McNamara',
+        'LEIGH ARINO DE LA RUBIA',
+        'Ines Germendia',
+        'Sandy Griffith',
+        'Lada Adamic',
+        'Stephanie Hicks',
+        'Melissa Santos',
+        'Laura McClay',
+        'Laura Hatfield',
+        'Kaitlin Thaney',
+        'Laurie Skelly',
+        'Bo Peng',
+        'Simina Boca',
+        'Helen Powell',
+        'Victoria Stodden'
+    ),
+    Description = c(
+        'statistics professor at UBC, teaching a great intro to data science class right now',
+        'data analyst at Etsy (former Hopkins grad student!) and co-creator (I think) of #rcatladies, also wrote this nice post on writing an R package from scratch',
+        'Ph.D. student at Hopkins, writes a great blog on data stuff, works on statistical genomics',
+        'Hopkins Ph.D. student, developer of methods for neuroimaging',
+        'currently running one of my favorite startups Fast Forward Labs, but basically needs no introduction, one of the biggest names in data science right now',
+        'former Hopkins postdoc, now at Harvard. Literally wrote the book on targeted learning',
+        'Hopkins Biostat faculty, working on neuroimaging and EMRs. Lead the team that won the ADHD-200 competition',
+        'Former Linkedin data scientist, now running the data team at Jawbone',
+        'runs the Julia group, also world class judoka, writes one of my favorite stats/education blogs',
+        'Works at the National Center for Ecological Analysis and Synthesis and maintains their projections blog',
+        'Hopkins biostat faculty, not technically her account. But she is the reason this is the funniest/best academic department twitter account out there',
+        'Does surveys and data quality/MRX work. If you are into MRX, check out her blog',
+        'Econ professor at U Chicago. Has been my favorite writer for FiveThirtyEight since their relaunch',
+        'writer for FiveThirtyEight, I like her "Am I normal" series of posts',
+        'cofounder of Polychart',
+        'professor at Gannon University, writes a great blog on teaching statistics',
+        "researcher at Murdoch Children's research institute, one of the real superstars in computational genomics",
+        'graduate student at UCLA, works on the Mobilize project and other awesome data education initiatives in LA school system',
+        'Editor in chief of DataScience.LA',
+        'data scientist working on official statistics at Basque Statistics - Eustat',
+        'Biostat Ph.D., fellow #rcatladies creator, professor at the Cleveland Clinic in quantitative medicine',
+        'professor at Michigan, teacher of really highly regarded social network analysis class on Coursera, now at Facebook (I think)',
+        'postdoc in compbio at Harvard, lead teaching assistant for Data Science course at Harvard',
+        'manager of Hadoop infrastructure at Etsy, maintainer of the women in data list below',
+        'professor of operations research at UW Madison, writes a blog with an amazing name: Punk Rock Operations Research',
+        "professor at Harvard, also has one of the best data titles I've ever heard: Princess of Bayesia",
+        'director of the Mozilla Science Lab, also works with Data Kind UK',
+        'Data scientist at Data Scope analytics',
+        'Data scientist at Data Scope analytics',
+        'former Hopkins Ph.D. student, now assistant professor at Georgetown in Biomedical informatics',
+        'postdoc in Biostatistics at Hopkins, works on statistics for relationship between air pollution and health',
+        'one of the leaders in the legal and sociological aspects of reproducible research'
+    )
+)
+## Add links to follow
+womenTwitter$Follow <- paste0("<a href=\"https://twitter.com/",
+    gsub('@', '', womenTwitter$Handle),
+    "\" class=\"twitter-follow-button\" data-show-count=\"false\">",
+    womenTwitter$Handle, "</a>")</code></pre>
+</div>
+<link rel='stylesheet' href='http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css' />
+<script src='http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js'></script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<div class="row">
+<table id="women_twitter">
+<thead>
+<tr>
+<th align="left">
+Handle
+</th>
+<th align="left">
+Name
+</th>
+<th align="left">
+Description
+</th>
+<th align="left">
+Follow
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">
+<span class="citation">@JennyBryan</span>
+</td>
+<td align="left">
+Jenny Bryan
+</td>
+<td align="left">
+statistics professor at UBC, teaching a great intro to data science class right now
+</td>
+<td align="left">
+<a href="https://twitter.com/JennyBryan" class="twitter-follow-button" data-show-count="false"><span class="citation">@JennyBryan</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@hspter</span>
+</td>
+<td align="left">
+Hilary Parker
+</td>
+<td align="left">
+data analyst at Etsy (former Hopkins grad student!) and co-creator (I think) of #rcatladies, also wrote this nice post on writing an R package from scratch
+</td>
+<td align="left">
+<a href="https://twitter.com/hspter" class="twitter-follow-button" data-show-count="false"><span class="citation">@hspter</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@acfrazee</span>
+</td>
+<td align="left">
+Alyssa Frazee
+</td>
+<td align="left">
+Ph.D. student at Hopkins, writes a great blog on data stuff, works on statistical genomics
+</td>
+<td align="left">
+<a href="https://twitter.com/acfrazee" class="twitter-follow-button" data-show-count="false"><span class="citation">@acfrazee</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@emsweene57</span>
+</td>
+<td align="left">
+Elizabeth Sweeney
+</td>
+<td align="left">
+Hopkins Ph.D. student, developer of methods for neuroimaging
+</td>
+<td align="left">
+<a href="https://twitter.com/emsweene57" class="twitter-follow-button" data-show-count="false"><span class="citation">@emsweene57</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@hmason</span>
+</td>
+<td align="left">
+Hilary Mason
+</td>
+<td align="left">
+currently running one of my favorite startups Fast Forward Labs, but basically needs no introduction, one of the biggest names in data science right now
+</td>
+<td align="left">
+<a href="https://twitter.com/hmason" class="twitter-follow-button" data-show-count="false"><span class="citation">@hmason</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@sherrirose</span>
+</td>
+<td align="left">
+Sherri Rose
+</td>
+<td align="left">
+former Hopkins postdoc, now at Harvard. Literally wrote the book on targeted learning
+</td>
+<td align="left">
+<a href="https://twitter.com/sherrirose" class="twitter-follow-button" data-show-count="false"><span class="citation">@sherrirose</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@eloyan_ani</span>
+</td>
+<td align="left">
+Ani Eloyan
+</td>
+<td align="left">
+Hopkins Biostat faculty, working on neuroimaging and EMRs. Lead the team that won the ADHD-200 competition
+</td>
+<td align="left">
+<a href="https://twitter.com/eloyan_ani" class="twitter-follow-button" data-show-count="false"><span class="citation">@eloyan_ani</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@mrogati</span>
+</td>
+<td align="left">
+Monica Rogati
+</td>
+<td align="left">
+Former Linkedin data scientist, now running the data team at Jawbone
+</td>
+<td align="left">
+<a href="https://twitter.com/mrogati" class="twitter-follow-button" data-show-count="false"><span class="citation">@mrogati</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@annmariastat</span>
+</td>
+<td align="left">
+AnnMaria De Mars
+</td>
+<td align="left">
+runs the Julia group, also world class judoka, writes one of my favorite stats/education blogs
+</td>
+<td align="left">
+<a href="https://twitter.com/annmariastat" class="twitter-follow-button" data-show-count="false"><span class="citation">@annmariastat</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@kara_woo</span>
+</td>
+<td align="left">
+Kara Woo
+</td>
+<td align="left">
+Works at the National Center for Ecological Analysis and Synthesis and maintains their projections blog
+</td>
+<td align="left">
+<a href="https://twitter.com/kara_woo" class="twitter-follow-button" data-show-count="false"><span class="citation">@kara_woo</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@jhubiostat</span>
+</td>
+<td align="left">
+Betsy Ogburn
+</td>
+<td align="left">
+Hopkins biostat faculty, not technically her account. But she is the reason this is the funniest/best academic department twitter account out there
+</td>
+<td align="left">
+<a href="https://twitter.com/jhubiostat" class="twitter-follow-button" data-show-count="false"><span class="citation">@jhubiostat</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@lovestats</span>
+</td>
+<td align="left">
+Annie Pettit
+</td>
+<td align="left">
+Does surveys and data quality/MRX work. If you are into MRX, check out her blog
+</td>
+<td align="left">
+<a href="https://twitter.com/lovestats" class="twitter-follow-button" data-show-count="false"><span class="citation">@lovestats</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@ProfEmilyOster</span>
+</td>
+<td align="left">
+Emily Oster
+</td>
+<td align="left">
+Econ professor at U Chicago. Has been my favorite writer for FiveThirtyEight since their relaunch
+</td>
+<td align="left">
+<a href="https://twitter.com/ProfEmilyOster" class="twitter-follow-button" data-show-count="false"><span class="citation">@ProfEmilyOster</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@monachalabi</span>
+</td>
+<td align="left">
+Mona Chalabi
+</td>
+<td align="left">
+writer for FiveThirtyEight, I like her &quot;Am I normal&quot; series of posts
+</td>
+<td align="left">
+<a href="https://twitter.com/monachalabi" class="twitter-follow-button" data-show-count="false"><span class="citation">@monachalabi</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@lisaczhang</span>
+</td>
+<td align="left">
+Lisa Zhang
+</td>
+<td align="left">
+cofounder of Polychart
+</td>
+<td align="left">
+<a href="https://twitter.com/lisaczhang" class="twitter-follow-button" data-show-count="false"><span class="citation">@lisaczhang</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@notawful</span>
+</td>
+<td align="left">
+Jessica Hartnett
+</td>
+<td align="left">
+professor at Gannon University, writes a great blog on teaching statistics
+</td>
+<td align="left">
+<a href="https://twitter.com/notawful" class="twitter-follow-button" data-show-count="false"><span class="citation">@notawful</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@AliciaOshlack</span>
+</td>
+<td align="left">
+Alicia Oshlack
+</td>
+<td align="left">
+researcher at Murdoch Children's research institute, one of the real superstars in computational genomics
+</td>
+<td align="left">
+<a href="https://twitter.com/AliciaOshlack" class="twitter-follow-button" data-show-count="false"><span class="citation">@AliciaOshlack</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@AmeliaMN</span>
+</td>
+<td align="left">
+Amelia McNamara
+</td>
+<td align="left">
+graduate student at UCLA, works on the Mobilize project and other awesome data education initiatives in LA school system
+</td>
+<td align="left">
+<a href="https://twitter.com/AmeliaMN" class="twitter-follow-button" data-show-count="false"><span class="citation">@AmeliaMN</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@leighadlr</span>
+</td>
+<td align="left">
+LEIGH ARINO DE LA RUBIA
+</td>
+<td align="left">
+Editor in chief of DataScience.LA
+</td>
+<td align="left">
+<a href="https://twitter.com/leighadlr" class="twitter-follow-button" data-show-count="false"><span class="citation">@leighadlr</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@inesgn</span>
+</td>
+<td align="left">
+Ines Germendia
+</td>
+<td align="left">
+data scientist working on official statistics at Basque Statistics - Eustat
+</td>
+<td align="left">
+<a href="https://twitter.com/inesgn" class="twitter-follow-button" data-show-count="false"><span class="citation">@inesgn</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@sgrifter</span>
+</td>
+<td align="left">
+Sandy Griffith
+</td>
+<td align="left">
+Biostat Ph.D., fellow #rcatladies creator, professor at the Cleveland Clinic in quantitative medicine
+</td>
+<td align="left">
+<a href="https://twitter.com/sgrifter" class="twitter-follow-button" data-show-count="false"><span class="citation">@sgrifter</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@ladamic</span>
+</td>
+<td align="left">
+Lada Adamic
+</td>
+<td align="left">
+professor at Michigan, teacher of really highly regarded social network analysis class on Coursera, now at Facebook (I think)
+</td>
+<td align="left">
+<a href="https://twitter.com/ladamic" class="twitter-follow-button" data-show-count="false"><span class="citation">@ladamic</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@stephaniehicks</span>
+</td>
+<td align="left">
+Stephanie Hicks
+</td>
+<td align="left">
+postdoc in compbio at Harvard, lead teaching assistant for Data Science course at Harvard
+</td>
+<td align="left">
+<a href="https://twitter.com/stephaniehicks" class="twitter-follow-button" data-show-count="false"><span class="citation">@stephaniehicks</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@ansate</span>
+</td>
+<td align="left">
+Melissa Santos
+</td>
+<td align="left">
+manager of Hadoop infrastructure at Etsy, maintainer of the women in data list below
+</td>
+<td align="left">
+<a href="https://twitter.com/ansate" class="twitter-follow-button" data-show-count="false"><span class="citation">@ansate</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@lauramclay</span>
+</td>
+<td align="left">
+Laura McClay
+</td>
+<td align="left">
+professor of operations research at UW Madison, writes a blog with an amazing name: Punk Rock Operations Research
+</td>
+<td align="left">
+<a href="https://twitter.com/lauramclay" class="twitter-follow-button" data-show-count="false"><span class="citation">@lauramclay</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@bioannie</span>
+</td>
+<td align="left">
+Laura Hatfield
+</td>
+<td align="left">
+professor at Harvard, also has one of the best data titles I've ever heard: Princess of Bayesia
+</td>
+<td align="left">
+<a href="https://twitter.com/bioannie" class="twitter-follow-button" data-show-count="false"><span class="citation">@bioannie</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@kaythaney</span>
+</td>
+<td align="left">
+Kaitlin Thaney
+</td>
+<td align="left">
+director of the Mozilla Science Lab, also works with Data Kind UK
+</td>
+<td align="left">
+<a href="https://twitter.com/kaythaney" class="twitter-follow-button" data-show-count="false"><span class="citation">@kaythaney</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@laurieskelly</span>
+</td>
+<td align="left">
+Laurie Skelly
+</td>
+<td align="left">
+Data scientist at Data Scope analytics
+</td>
+<td align="left">
+<a href="https://twitter.com/laurieskelly" class="twitter-follow-button" data-show-count="false"><span class="citation">@laurieskelly</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@bo_p</span>
+</td>
+<td align="left">
+Bo Peng
+</td>
+<td align="left">
+Data scientist at Data Scope analytics
+</td>
+<td align="left">
+<a href="https://twitter.com/bo_p" class="twitter-follow-button" data-show-count="false"><span class="citation">@bo_p</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@siminaboca</span>
+</td>
+<td align="left">
+Simina Boca
+</td>
+<td align="left">
+former Hopkins Ph.D. student, now assistant professor at Georgetown in Biomedical informatics
+</td>
+<td align="left">
+<a href="https://twitter.com/siminaboca" class="twitter-follow-button" data-show-count="false"><span class="citation">@siminaboca</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@HelenPowell01</span>
+</td>
+<td align="left">
+Helen Powell
+</td>
+<td align="left">
+postdoc in Biostatistics at Hopkins, works on statistics for relationship between air pollution and health
+</td>
+<td align="left">
+<a href="https://twitter.com/HelenPowell01" class="twitter-follow-button" data-show-count="false"><span class="citation">@HelenPowell01</span></a>
+</td>
+</tr>
+<tr>
+<td align="left">
+<span class="citation">@victoriastodden</span>
+</td>
+<td align="left">
+Victoria Stodden
+</td>
+<td align="left">
+one of the leaders in the legal and sociological aspects of reproducible research
+</td>
+<td align="left">
+<a href="https://twitter.com/victoriastodden" class="twitter-follow-button" data-show-count="false"><span class="citation">@victoriastodden</span></a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+    $('#women_twitter').dataTable({
+        "sPaginationType": "full_numbers",
+        "sScrollX": "100%",
+        "iDisplayLength": 50
+    });
+});
+</script>
+<p>Interactive table powered by <a href="http://www.datatables.net/">DataTables</a> and <code>knitr</code> (<a href='http://yihui.name/knitr/'>Xie, 2014</a>).</p>
+<h1>More</h1>
+<p>I have also been informed that these Twitter lists are probably better than my post. But I'll keep updating my list anyway cause I want to know who all the right people to follow are!</p>
+<ul>
+<li><a href="https://twitter.com/ansate/lists/women-in-data">women-in-data</a></li>
+<li><a href="https://twitter.com/BecomingDataSci/lists/women-in-data-science">women-in-data-science</a></li>
+</ul>
+<h1>References</h1>
+<p>Citations made with <code>knitcitations</code> (<a href='https://github.com/cboettig/knitcitations'>Boettiger, 2014</a>).</p>
+<div class="row">
+<p>
+<a id='bib-knitcitations'></a><a href="#cite-knitcitations">[1]</a><cite> C. Boettiger. <EM>knitcitations: Citations for knitr markdown files</EM>. R package version 1.0.2. 2014. URL: <a href="https://github.com/cboettig/knitcitations">https://github.com/cboettig/knitcitations</a>.</cite>
+</p>
+<p>
+<a id='bib-knitr'></a><a href="#cite-knitr">[2]</a><cite> Y. Xie. <EM>knitr: A general-purpose package for dynamic report generation in R</EM>. R package version 1.6. 2014. URL: <a href="http://yihui.name/knitr/">http://yihui.name/knitr/</a>.</cite>
+</p>
+</div>
+<p>Date this page was last rendered:</p>
+<div class="row">
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## [1] "2014-10-04 13:24:55 EDT"
+</code></pre>
+</div>
+</div>
+</div>
+<div class="navbar navbar-fixed-bottom navbar-inverse">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+</button>
+</div>
+<div id="bottom-navbar" class="navbar-collapse collapse navbar-responsive-collapse">
+<ul class="nav navbar-nav navbar-right">
+<li class="nav">
+<p class="navbar-text">
+Toggle
+</p>
+</li>
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Code <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="dropdown-header">
+Languages
+</li>
+<li class="active">
+<a href="#" class="toggle-global source R" type="source.R">R</a>
+</li>
+<li>
+<a href="#" type="all-source" class="toggle-global">All</a>
+</li>
+</ul>
+</li>
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Output <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="dropdown-header">
+Type
+</li>
+<li class="active">
+<a href="#" class="toggle-global output" type="output">output</a>
+</li>
+<li>
+<a href="#" type="all-output" class="toggle-global">All</a>
+</li>
+</ul>
+</li>
+<li class="active">
+<a href="#" type="figure" class="toggle-global">Figures</a>
+</li>
+</ul>
+<ul class="nav navbar-nav navbar-left">
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Bootstrap theme <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="active">
+<a class="theme-switch" title="Default" href="#">Default</a>
+</li>
+<li>
+<a class="theme-switch" title="Amelia" href="#">Amelia</a>
+</li>
+<li>
+<a class="theme-switch" title="Cerulean" href="#">Cerulean</a>
+</li>
+<li>
+<a class="theme-switch" title="Cosmo" href="#">Cosmo</a>
+</li>
+<li>
+<a class="theme-switch" title="Cyborg" href="#">Cyborg</a>
+</li>
+<li>
+<a class="theme-switch" title="Journal" href="#">Journal</a>
+</li>
+<li>
+<a class="theme-switch" title="Flatly" href="#">Flatly</a>
+</li>
+<li>
+<a class="theme-switch" title="Readable" href="#">Readable</a>
+</li>
+<li>
+<a class="theme-switch" title="Simplex" href="#">Simplex</a>
+</li>
+<li>
+<a class="theme-switch" title="Slate" href="#">Slate</a>
+</li>
+<li>
+<a class="theme-switch" title="Spacelab" href="#">Spacelab</a>
+</li>
+<li>
+<a class="theme-switch" title="United" href="#">United</a>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="nav navbar-nav navbar-left">
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Code highlighting <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="active">
+<a class="highlight-switch" title="HighlightJs" href="#">HighlightJs</a>
+</li>
+<li>
+<a class="highlight-switch" title="Dark" href="#">Dark</a>
+</li>
+<li>
+<a class="highlight-switch" title="Far" href="#">Far</a>
+</li>
+<li>
+<a class="highlight-switch" title="Idea" href="#">Idea</a>
+</li>
+<li>
+<a class="highlight-switch" title="Sunburst" href="#">Sunburst</a>
+</li>
+<li>
+<a class="highlight-switch" title="Zenburn" href="#">Zenburn</a>
+</li>
+<li>
+<a class="highlight-switch" title="Visual Studio" href="#">Visual Studio</a>
+</li>
+<li>
+<a class="highlight-switch" title="Ascetic" href="#">Ascetic</a>
+</li>
+<li>
+<a class="highlight-switch" title="Magula" href="#">Magula</a>
+</li>
+<li>
+<a class="highlight-switch" title="Github" href="#">Github</a>
+</li>
+<li>
+<a class="highlight-switch" title="Google Code" href="#">Google Code</a>
+</li>
+<li>
+<a class="highlight-switch" title="Brown Paper" href="#">Brown Paper</a>
+</li>
+<li>
+<a class="highlight-switch" title="School Book" href="#">School Book</a>
+</li>
+<li>
+<a class="highlight-switch" title="IR Black" href="#">IR Black</a>
+</li>
+<li>
+<a class="highlight-switch" title="Solarized - Dark" href="#">Solarized - Dark</a>
+</li>
+<li>
+<a class="highlight-switch" title="Solarized - Light" href="#">Solarized - Light</a>
+</li>
+<li>
+<a class="highlight-switch" title="Arta" href="#">Arta</a>
+</li>
+<li>
+<a class="highlight-switch" title="Monokai" href="#">Monokai</a>
+</li>
+<li>
+<a class="highlight-switch" title="Xcode" href="#">Xcode</a>
+</li>
+<li>
+<a class="highlight-switch" title="Pojoaque" href="#">Pojoaque</a>
+</li>
+<li>
+<a class="highlight-switch" title="Rainbow" href="#">Rainbow</a>
+</li>
+<li>
+<a class="highlight-switch" title="Tomorrow" href="#">Tomorrow</a>
+</li>
+<li>
+<a class="highlight-switch" title="Tomorrow Night" href="#">Tomorrow Night</a>
+</li>
+<li>
+<a class="highlight-switch" title="Tomorrow Night Bright" href="#">Tomorrow Night Bright</a>
+</li>
+<li>
+<a class="highlight-switch" title="Tomorrow Night Blue" href="#">Tomorrow Night Blue</a>
+</li>
+<li>
+<a class="highlight-switch" title="Tomorrow Night Eighties" href="#">Tomorrow Night Eighties</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" title="Default" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/amelia/bootstrap.min.css" title="Amelia" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/cerulean/bootstrap.min.css" title="Cerulean" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/cosmo/bootstrap.min.css" title="Cosmo" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/cyborg/bootstrap.min.css" title="Cyborg" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/journal/bootstrap.min.css" title="Journal" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/flatly/bootstrap.min.css" title="Flatly" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/readable/bootstrap.min.css" title="Readable" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/simplex/bootstrap.min.css" title="Simplex" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css" title="Slate" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/spacelab/bootstrap.min.css" title="Spacelab" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootswatch/3.0.0/united/bootstrap.min.css" title="United" media="screen"></link><link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/default.min.css" title="HighlightJs" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/dark.min.css" title="Dark" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/far.min.css" title="Far" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/idea.min.css" title="Idea" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/sunburst.min.css" title="Sunburst" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/zenburn.min.css" title="Zenburn" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/vs.min.css" title="Visual Studio" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/ascetic.min.css" title="Ascetic" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/magula.min.css" title="Magula" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/github.min.css" title="Github" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/googlecode.min.css" title="Google Code" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/brown_paper.min.css" title="Brown Paper" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/school_book.min.css" title="School Book" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/ir_black.min.css" title="IR Black" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/solarized_dark.min.css" title="Solarized - Dark" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/solarized_light.min.css" title="Solarized - Light" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/arta.min.css" title="Arta" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/monokai.min.css" title="Monokai" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/xcode.min.css" title="Xcode" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/pojoaque.min.css" title="Pojoaque" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/rainbow.min.css" title="Rainbow" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/tomorrow.min.css" title="Tomorrow" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/tomorrow-night.min.css" title="Tomorrow Night" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/tomorrow-night-bright.min.css" title="Tomorrow Night Bright" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/tomorrow-night-blue.min.css" title="Tomorrow Night Blue" media="screen"></link> <link rel="alternate stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/tomorrow-night-eighties.min.css" title="Tomorrow Night Eighties" media="screen"></link>
+</div>
+<div id="push">
+
+</div>
+<div id="footer">
+<div class="container">
+<p class="text-muted" id="credit">
+Styled with <a href="https://github.com/jimhester/knitrBootstrap">knitrBootstrap</a>
+</p>
+</div>
+</div>
+<link rel="stylesheet" id="theme" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen"></link><link rel="stylesheet" id="highlight" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/styles/default.min.css" media="screen"></link>
+</div>
+</body>
+</html>
